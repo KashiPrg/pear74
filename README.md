@@ -1,16 +1,15 @@
 # pear74
 
-A new Flutter project.
+## iOSにおけるビルド
 
-## Getting Started
+サイズが100MBを超えており、GitHubにアップロードできないため、iOS向けのビルドに必要なファイルの一部がリポジトリに含まれていません。  
+以下に必要なファイルを導入する手順を記述します。  
+なお、この手順は2020-10-22時点でのものです。
 
-This project is a starting point for a Flutter application.
+- [OpenCVの配布ページ](https://opencv.org/releases/)にアクセスし、**最新版の"iOS pack"**をダウンロードします。
+- ダウンロードしたファイル(**opencv-x.x.x-ios-framework.zip**のような名前になっていると思われます。x.x.xはバージョンを示します)を解凍します。**opencv2.framework**というフォルダが出てきます。
+- ターミナルでこのリポジトリの`ios`ディレクトリに飛びます。
+- `open Runner.xcworkspace`を実行し、Xcodeを開きます。
+- Xcodeが管理しているファイル群の画面を開き、先の手順で解凍した**opencv2.framework**を、ドラッグ&ドロップでプロジェクトにインポートします。
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+これで必要なコンポーネントが揃ったはずです。
