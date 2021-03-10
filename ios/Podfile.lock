@@ -24,11 +24,11 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/path_provider/ios"
 
 SPEC CHECKSUMS:
-  camera: 38cc83ae9a5667bb5a71c7d9edaf60a91920fd4e
-  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  camera: a0ca5080336f7af47b88436e5e26da3dee5568f0
+  Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
   judge_colorchart: 88817acf7259781d1e59ebc535255d28f9d81ea5
   path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
 
 PODFILE CHECKSUM: 588c7b99558874fcb80a39261fdd9f198b5911d4
 
-COCOAPODS: 1.9.3
+COCOAPODS: 1.10.1

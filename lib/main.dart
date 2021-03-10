@@ -195,9 +195,6 @@ class _CameraAppState extends State<CameraApp> {
     _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(message)));
   }
 
-  /// タイムスタンプ取得
-  String timestamp() => DateTime.now().millisecondsSinceEpoch.toString();
-
   /// カメラ撮影処理
   Future<List<String>> takePicture() async {
     // 撮影した画像を保存するパスを決定
@@ -241,29 +238,32 @@ class SavedPictures extends StatefulWidget {
 }
 
 class _SavedPicturesState extends State<SavedPictures> {
-  List<File> _picturesList;
+  List<File> _takenPicturesList;
+  List<File> _processedPicturesList;
 
   @override
   Widget build(BuildContext context) {
     // 撮った写真のファイルパスのリストを取得
-    _picturesList = PictureManager.takenPicturesPathList();
+    _takenPicturesList = PictureManager.processedPicturesPathList();
+    _processedPicturesList = PictureManager.takenPicturesPathList();
 
     // 新しい順に並べる
-    _picturesList.sort((a, b) => b.path.compareTo(a.path));
+    _takenPicturesList.sort((a, b) => b.path.compareTo(a.path));
+    _processedPicturesList.sort((a, b) => b.path.compareTo(a.path));
 
     return Scaffold(
         appBar: AppBar(
           title: Text("Saved Pictures"),
         ),
         body: ListView.builder(
-            itemCount: _picturesList.length,
+            itemCount: _takenPicturesList.length,
             itemBuilder: (BuildContext context, int index) {
-              final item = _picturesList[index];
+              final takenItem = _takenPicturesList[index];
 
               // スワイプして削除できるようにする
               return Dismissible(
                 // 一意に特定できるキーを設定する ファイル名なら重複しない
-                key: Key(item.path),
+                key: Key(takenItem.path),
 
                 // スワイプされたときの動作を記述する
                 // [direction]にスワイプの方向が格納されている
@@ -274,10 +274,11 @@ class _SavedPicturesState extends State<SavedPictures> {
                   if (direction == DismissDirection.endToStart) {
                     setState(() {
                       // 実体を削除する
-                      FileManager.removeFile(item);
+                      FileManager.removeFile(takenItem);
+                      FileManager.removeFile(_processedPicturesList[index]);
 
                       // スワイプされた要素をリストから削除する
-                      _picturesList.removeAt(index);
+                      _takenPicturesList.removeAt(index);
                     });
                   }
                 },
@@ -310,8 +311,11 @@ class _SavedPicturesState extends State<SavedPictures> {
                 // ListViewの要素
                 child: Card(
                     child: ListTile(
-                  leading: Image.file(item),
-                  title: Text(p.basenameWithoutExtension(item.path)),
+                  // 画像のサムネイル
+                  leading: Image.file(takenItem),
+                  // 拡張子なしのファイル名
+                  title: Text(p.basenameWithoutExtension(takenItem.path)),
+                  // カラーチャートの数値
                   trailing: Text('2.5'),
                 )),
               );

@@ -90,7 +90,7 @@ namespace cv { namespace debug_build_guard { } using namespace debug_build_guard
 // keep current value (through OpenCV port file)
 #elif defined __GNUC__ || (defined (__cpluscplus) && (__cpluscplus >= 201103))
 #define CV_Func __func__
-#elif defined __clang__ && (__clang_minor__ * 100 + __clang_major >= 305)
+#elif defined __clang__ && (__clang_minor__ * 100 + __clang_major__ >= 305)
 #define CV_Func __func__
 #elif defined(__STDC_VERSION__) && (__STDC_VERSION >= 199901)
 #define CV_Func __func__
@@ -272,6 +272,8 @@ namespace cv {
 #define CV_CPU_VSX              200
 #define CV_CPU_VSX3             201
 
+#define CV_CPU_RVV              210
+
 // CPU features groups
 #define CV_CPU_AVX512_SKX       256
 #define CV_CPU_AVX512_COMMON    257
@@ -323,6 +325,8 @@ enum CpuFeatures {
 
     CPU_VSX             = 200,
     CPU_VSX3            = 201,
+
+    CPU_RVV             = 210,
 
     CPU_AVX512_SKX      = 256, //!< Skylake-X with AVX-512F/CD/BW/DQ/VL
     CPU_AVX512_COMMON   = 257, //!< Common instructions AVX-512F/CD for all CPUs that support AVX-512
@@ -840,7 +844,7 @@ protected:
     float16_t() : w(0) {}
     explicit float16_t(float x)
     {
-    #if CV_AVX2
+    #if CV_FP16
         __m128 v = _mm_load_ss(&x);
         w = (ushort)_mm_cvtsi128_si32(_mm_cvtps_ph(v, 0));
     #else
@@ -871,7 +875,7 @@ protected:
 
     operator float() const
     {
-    #if CV_AVX2
+    #if CV_FP16
         float f;
         _mm_store_ss(&f, _mm_cvtph_ps(_mm_cvtsi32_si128(w)));
         return f;

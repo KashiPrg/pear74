@@ -1,0 +1,6 @@
+# ninja log v5
+0	1507	1614843392	CMakeFiles/native_opencv.dir/Users/nakashima/Desktop/pear74/ios/Classes/native_opencv.cpp.o	25d462318944457a
+1508	1543	1614843392	/Users/nakashima/Desktop/pear74/build/app/intermediates/cmake/debug/obj/x86_64/libnative_opencv.so	1759b6728ff7b2cd
+1	53	1615281563	/Users/nakashima/Desktop/pear74/build/app/intermediates/cmake/debug/obj/x86_64/libnative_opencv.so	1759b6728ff7b2cd
+2	1482	1615364020	CMakeFiles/native_opencv.dir/Users/nakashima/Desktop/pear74/ios/Classes/native_opencv.cpp.o	25d462318944457a
+1482	1528	1615364020	/Users/nakashima/Desktop/pear74/build/app/intermediates/cmake/debug/obj/x86_64/libnative_opencv.so	1759b6728ff7b2cd

@@ -27,6 +27,8 @@ apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
     compileSdkVersion 28
+    // ↓[NDK issue after flutter upgrade, No version of NDK matched the requested](https://github.com/flutter/flutter/issues/53657)
+    ndkVersion '23.0.7123448-rc1'
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'

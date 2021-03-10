@@ -1,0 +1,22 @@
+{
+  "buildFiles": [
+    "/Users/nakashima/Library/Android/sdk/ndk/23.0.7123448/build/cmake/platforms.cmake",
+    "/Users/nakashima/Library/Android/sdk/ndk/23.0.7123448/build/cmake/compiler_id.cmake",
+    "/Users/nakashima/Library/Android/sdk/ndk/23.0.7123448/build/cmake/android.toolchain.cmake",
+    "/Users/nakashima/Desktop/pear74/android/app/CMakeLists.txt",
+    "/Users/nakashima/Library/Android/sdk/ndk/23.0.7123448/build/cmake/android-legacy.toolchain.cmake"
+  ],
+  "cleanCommands": [
+    "/Users/nakashima/Library/Android/sdk/cmake/3.10.2.4988404/bin/ninja -C \"/Users/nakashima/Desktop/pear74/android/app/.cxx/cmake/debug/x86\" clean"
+  ],
+  "buildTargetsCommand": "/Users/nakashima/Library/Android/sdk/cmake/3.10.2.4988404/bin/ninja  -C \"/Users/nakashima/Desktop/pear74/android/app/.cxx/cmake/debug/x86\" {LIST_OF_TARGETS_TO_BUILD}",
+  "libraries": {
+    "native_opencv-Debug-x86": {
+      "artifactName": "native_opencv",
+      "buildCommand": "/Users/nakashima/Library/Android/sdk/cmake/3.10.2.4988404/bin/ninja -C \"/Users/nakashima/Desktop/pear74/android/app/.cxx/cmake/debug/x86\" native_opencv",
+      "abi": "x86",
+      "output": "/Users/nakashima/Desktop/pear74/build/app/intermediates/cmake/debug/obj/x86/libnative_opencv.so",
+      "runtimeFiles": []
+    }
+  }
+}
