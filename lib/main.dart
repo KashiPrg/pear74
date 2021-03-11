@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:camera/camera.dart';
@@ -73,6 +74,12 @@ class _CameraAppState extends State<CameraApp> {
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
+  // カメラのプレビュー画面を特定するためのキー
+  final GlobalKey _cameraPreviewKey = GlobalKey();
+  // 切り抜き範囲提示用の輪のサイズ(後で変更をかける)
+  double _cutoutCircleSize = 40.0;
+  bool _cutoutCircleSizeDecided = false;
+
   // final double _bottomBoxHeight = 75.0;
 
   @override
@@ -103,6 +110,23 @@ class _CameraAppState extends State<CameraApp> {
     if (!controller.value.isInitialized) {
       return Container();
     }
+    // 切り抜き範囲提示用の輪のサイズが決定されていないとき、build終了時に決定する
+    if (!_cutoutCircleSizeDecided) {
+      // これでbuild終了時に実行する処理が書ける
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        setState(() {
+          // カメラプレビューのRenderBoxは描画が終わっていないと取得できない
+          // したがってbuild終了時に取得する必要がある
+          RenderBox box = _cameraPreviewKey.currentContext.findRenderObject();
+
+          // 取得したカメラプレビューの横幅をもとに輪のサイズを決定
+          // iPhoneとAndroidでは同じ設定でも解像度が異なることがあるため、横幅をもとに決定
+          // ResolutionPreset.mediumのサマリーを見れば、解像度の違いがわかる
+          _cutoutCircleSize = box.size.width / 15 * 2; // 480 / 15 * 2 = 64
+          _cutoutCircleSizeDecided = true;
+        });
+      });
+    }
     return MaterialApp(
       title: 'Pear Harvest Time Checker',
       theme: ThemeData(
@@ -124,7 +148,22 @@ class _CameraAppState extends State<CameraApp> {
               Flexible(
                 child: AspectRatio(
                   aspectRatio: controller.value.aspectRatio,
-                  child: CameraPreview(controller),
+                  // Stackでカメラ画面を奥に、切り抜き範囲提示用の輪を手前に表示する
+                  child: Stack(
+                    children: <Widget>[
+                      Container(
+                        key: _cameraPreviewKey,
+                        child: CameraPreview(controller),
+                      ), // カメラ画面
+                      // 切り抜き用の輪
+                      Center(
+                        child: CustomPaint(
+                          size: Size(_cutoutCircleSize, _cutoutCircleSize),
+                          painter: CutoutCirclePaint(),
+                        ),
+                      )
+                    ],
+                  ),
                 ),
               ),
               // 撮影ボタンとアルバムボタン
@@ -232,6 +271,26 @@ class _CameraAppState extends State<CameraApp> {
   /// エラーログ
   void logError(String code, String message) =>
       print('Error: $code/nError Message: $message');
+}
+
+/// 輪を描画するためのクラス
+class CutoutCirclePaint extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.lightGreen
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeWidth = 5;
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = min(size.width, size.height);
+    canvas.drawCircle(center, radius, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return false;
+  }
 }
 
 /// 撮った写真の一覧を表示する画面
