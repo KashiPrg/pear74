@@ -65,13 +65,6 @@ class _CameraAppState extends State<CameraApp> {
   CameraController controller;
   String imagePath;
 
-  /// ネイティブ側でOpenCVを扱うためのメソッドチャンネル
-  /// 2020-08-29現在、FlutterにはiOSでもOpenCVを扱えるようにするライブラリがない(Android用のはある)
-  /// なので、ネイティブ側でやってもらうしかない
-  /// また、保守性の観点からサードパーティ製のライブラリはあまり使いたくない
-  static const MethodChannel _opencv =
-      const MethodChannel('com.miyatalab.pear74/opencv');
-
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   // カメラのプレビュー画面を特定するためのキー
@@ -248,15 +241,6 @@ class _CameraAppState extends State<CameraApp> {
       // すでに同名のファイルが存在していた場合など、何らかの例外が発生した場合の処理
       _showCameraException(e);
     }
-
-    // カラーチャート判定のためにネイティブ(Swift/Kotlin)の処理を呼ぶ
-    // なぜネイティブ側で処理しなければならないかは"_opencv"の説明を参照のこと
-    final Map invokeMethodParams = <String, dynamic>{
-      'picPath': filesPath[0],
-      'procPath': filesPath[1],
-    };
-    // final String result =
-    // await _opencv.invokeMethod('JudgeColorChart', invokeMethodParams);
 
     showInSnackBar(processImage(filesPath[0], filesPath[1]));
 
