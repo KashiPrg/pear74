@@ -47,6 +47,7 @@ class MainApp extends StatelessWidget {
       routes: <String, WidgetBuilder>{
         '/': (BuildContext context) => new CameraApp(),
         '/SavedPictures': (BuildContext context) => new SavedPictures(),
+        '/PicturePreview': (BuildContext context) => new PicturePreview(),
       },
     );
   }
@@ -233,7 +234,7 @@ class _CameraAppState extends State<CameraApp> {
       print('Error: $code/nError Message: $message');
 }
 
-/// 撮った写真確認用の画面
+/// 撮った写真の一覧を表示する画面
 class SavedPictures extends StatefulWidget {
   @override
   _SavedPicturesState createState() => _SavedPicturesState();
@@ -313,6 +314,11 @@ class _SavedPicturesState extends State<SavedPictures> {
                 // ListViewの要素
                 child: Card(
                     child: ListTile(
+                  onTap: () {
+                    // タッチしたらその写真のプレビューに飛ぶ
+                    Navigator.of(context)
+                        .pushNamed('/PicturePreview', arguments: takenItem);
+                  },
                   // 画像のサムネイル
                   leading: Image.file(takenItem),
                   // 拡張子なしのファイル名
@@ -322,5 +328,36 @@ class _SavedPicturesState extends State<SavedPictures> {
                 )),
               );
             }));
+  }
+}
+
+/// 撮った写真の確認用の画面
+class PicturePreview extends StatefulWidget {
+  /// ページ呼び出し用のメソッド
+  static Route<dynamic> route({@required File picture}) {
+    return MaterialPageRoute<dynamic>(
+      builder: (_) => new PicturePreview(),
+      settings: RouteSettings(arguments: picture),
+    );
+  }
+
+  @override
+  _PicturePreviewState createState() => _PicturePreviewState();
+}
+
+class _PicturePreviewState extends State<PicturePreview> {
+  @override
+  Widget build(BuildContext context) {
+    File picture = ModalRoute.of(context).settings.arguments;
+
+    return Scaffold(
+      appBar: AppBar(
+          // タイトルは拡張子なしのファイル名
+          title: Text(p.basenameWithoutExtension(picture.path))),
+      // 中央に画像を表示
+      body: Center(
+        child: Image.file(picture),
+      ),
+    );
   }
 }
