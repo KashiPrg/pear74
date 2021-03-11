@@ -153,19 +153,20 @@ class _CameraAppState extends State<CameraApp> {
                       minWidth: 60.0,
                       height: 60.0,
                       // 浮き上がった感じの影があるボタン
-                      child: RaisedButton(
-                        // ボタンの中のカメラアイコン
-                        child: Icon(
-                          Icons.camera_alt,
-                          color: Colors.lightGreen,
-                          size: 30.0,
-                        ),
-                        // 押したら撮影
-                        onPressed: () => onTakePictureButtonPressed(),
-                        color: Colors.white,
-                        // 形は円形
-                        shape: CircleBorder(),
-                      ),
+                      child: ElevatedButton(
+                          // ボタンの中のカメラアイコン
+                          child: Icon(
+                            Icons.camera_alt,
+                            color: Colors.lightGreen,
+                            size: 30.0,
+                          ),
+                          // 押したら撮影
+                          onPressed: () => onTakePictureButtonPressed(),
+                          // スタイル
+                          style: ElevatedButton.styleFrom(
+                              primary: Colors.white, // 白
+                              shape: CircleBorder(), // 円形
+                              minimumSize: Size(60, 60))),
                     ))
                   ],
                 ),
@@ -192,6 +193,7 @@ class _CameraAppState extends State<CameraApp> {
 
   /// スナックバー表示、画像保存時にファイルパスが表示される
   void showInSnackBar(String message) {
+    // deprecatedな部分を修正する方法が現状不明
     _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(message)));
   }
 
