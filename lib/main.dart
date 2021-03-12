@@ -63,7 +63,6 @@ class CameraApp extends StatefulWidget {
 /// カメラウィジェット本体 起動したら最初に出てくる画面
 class _CameraAppState extends State<CameraApp> {
   CameraController controller;
-  String imagePath;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -227,9 +226,8 @@ class _CameraAppState extends State<CameraApp> {
     // 写真を撮る処理と、その後の処理
     takePicture().then((List<String> filesPath) {
       if (filesPath != null) {
-        setState(() {
-          imagePath = filesPath[0];
-        });
+        // 画像処理
+        showInSnackBar(processImage(filesPath[0], filesPath[1]));
         // showInSnackBar('Picture saved to ${filesPath[0]}');
       }
     });
@@ -260,8 +258,6 @@ class _CameraAppState extends State<CameraApp> {
     }
 
     await picture.saveTo(filesPath[0]);
-
-    showInSnackBar(processImage(filesPath[0], filesPath[1]));
 
     return filesPath;
   }
