@@ -80,10 +80,11 @@ class _CameraAppState extends State<CameraApp> {
     super.initState();
     // カメラ初期設定
     controller = CameraController(
-      cameras[0], //背面カメラのみ
-      ResolutionPreset.medium, // iPhoneだと解像度はmediumくらいが縦横比的にちょうどいい
-      enableAudio: false, //音声は不要
-    );
+        cameras[0], //背面カメラのみ
+        ResolutionPreset.medium, // iPhoneだと解像度はmediumくらいが縦横比的にちょうどいい
+        enableAudio: false, //音声は不要
+        imageFormatGroup: ImageFormatGroup.jpeg // jpeg形式で保存
+        );
     controller.initialize().then((_) {
       if (!mounted) {
         return;
@@ -115,7 +116,8 @@ class _CameraAppState extends State<CameraApp> {
           // 取得したカメラプレビューの横幅をもとに輪のサイズを決定
           // iPhoneとAndroidでは同じ設定でも解像度が異なることがあるため、横幅をもとに決定
           // ResolutionPreset.mediumのサマリーを見れば、解像度の違いがわかる
-          _cutoutCircleSize = box.size.width / 15 * 2; // 480 / 15 * 2 = 64
+          // 乗数は2で良かったはずだが、cameraを0.8.0に更新したらずれた
+          _cutoutCircleSize = box.size.width / 15 * 2.15; // 480 / 15 * 2 = 64
           _cutoutCircleSizeDecided = true;
         });
       });
@@ -137,25 +139,34 @@ class _CameraAppState extends State<CameraApp> {
           // Columnで縦に要素を並べる
           child: Column(
             children: <Widget>[
-              // カメラ画面
-              Flexible(
-                child: AspectRatio(
-                  aspectRatio: controller.value.aspectRatio,
-                  // Stackでカメラ画面を奥に、切り抜き範囲提示用の輪を手前に表示する
-                  child: Stack(
-                    children: <Widget>[
-                      Container(
-                        key: _cameraPreviewKey,
-                        child: CameraPreview(controller),
-                      ), // カメラ画面
-                      // 切り抜き用の輪
-                      Center(
-                        child: CustomPaint(
+              Expanded(
+                child: Container(
+                  child: Padding(
+                    padding: const EdgeInsets.all(1.0),
+                    // Stackでカメラ画面を奥に、切り抜き範囲提示用の輪を手前に表示する
+                    child: Stack(
+                      children: <Widget>[
+                        // カメラ画面
+                        Center(
+                            child: Container(
+                          key: _cameraPreviewKey,
+                          child: CameraPreview(controller),
+                        )),
+                        // 切り抜き範囲提示用の輪
+                        Center(
+                            child: CustomPaint(
                           size: Size(_cutoutCircleSize, _cutoutCircleSize),
                           painter: CutoutCirclePaint(),
-                        ),
-                      )
-                    ],
+                        )),
+                      ],
+                    ),
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    border: Border.all(
+                      color: Colors.lightGreenAccent,
+                      width: 3.0,
+                    ),
                   ),
                 ),
               ),
@@ -234,13 +245,21 @@ class _CameraAppState extends State<CameraApp> {
   Future<List<String>> takePicture() async {
     // 撮影した画像を保存するパスを決定
     final List<String> filesPath = PictureManager.picturesPathTimeStamped();
+    XFile picture;
+
+    if (controller.value.isTakingPicture) {
+      // 写真を撮っている最中なので何もしない
+      return null;
+    }
 
     try {
-      await controller.takePicture(filesPath[0]); // 撮影と保存
+      picture = await controller.takePicture(); // 撮影と保存
     } on CameraException catch (e) {
       // すでに同名のファイルが存在していた場合など、何らかの例外が発生した場合の処理
       _showCameraException(e);
     }
+
+    await picture.saveTo(filesPath[0]);
 
     showInSnackBar(processImage(filesPath[0], filesPath[1]));
 
