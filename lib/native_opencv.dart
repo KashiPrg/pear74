@@ -28,10 +28,10 @@ final _ProcessImageFunc _processImage = _lib
     .asFunction();
 
 String opencvVersion() {
-  return Utf8.fromUtf8(_version());
+  return _version().toDartString();
 }
 
 String processImage(String inputPath, String outputPath) {
-  return Utf8.fromUtf8(
-      _processImage(Utf8.toUtf8(inputPath), Utf8.toUtf8(outputPath)));
+  return _processImage(inputPath.toNativeUtf8(), outputPath.toNativeUtf8())
+      .toDartString();
 }
