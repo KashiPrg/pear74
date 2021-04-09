@@ -311,9 +311,9 @@ class _SavedPicturesState extends State<SavedPictures> {
   @override
   Widget build(BuildContext context) {
     // 撮った写真などのファイルパスのリストを取得
-    _takenPicturesList = PictureManager.processedPicturesPathList();
+    _takenPicturesList = PictureManager.takenPicturesPathList();
     _trimmedPicturesList = PictureManager.trimmedPicturesPathList();
-    _processedPicturesList = PictureManager.takenPicturesPathList();
+    _processedPicturesList = PictureManager.processedPicturesPathList();
     _analyzedTextsList = PictureManager.analyzedTextsPathList();
 
     // 新しい順に並べる
@@ -386,8 +386,12 @@ class _SavedPicturesState extends State<SavedPictures> {
                     child: ListTile(
                   onTap: () {
                     // タッチしたらその写真のプレビューに飛ぶ
-                    Navigator.of(context)
-                        .pushNamed('/PicturePreview', arguments: takenItem);
+                    Navigator.of(context).pushNamed('/PicturePreview',
+                        arguments: new PicturePreviewContainer(
+                            takenItem,
+                            _trimmedPicturesList[index],
+                            _processedPicturesList[index],
+                            _analyzedTextsList[index]));
                   },
                   // 画像のサムネイル
                   leading: Image.file(takenItem),
@@ -401,13 +405,24 @@ class _SavedPicturesState extends State<SavedPictures> {
   }
 }
 
+class PicturePreviewContainer {
+  PicturePreviewContainer(this.takenPicture, this.trimmedPicture,
+      this.processedPicture, this.analyzedText);
+
+  final File takenPicture;
+  final File trimmedPicture;
+  final File processedPicture;
+  final File analyzedText;
+}
+
 /// 撮った写真の確認用の画面
 class PicturePreview extends StatefulWidget {
   /// ページ呼び出し用のメソッド
-  static Route<dynamic> route({@required File picture}) {
+  static Route<dynamic> route(
+      {@required PicturePreviewContainer picPreContainer}) {
     return MaterialPageRoute<dynamic>(
       builder: (_) => new PicturePreview(),
-      settings: RouteSettings(arguments: picture),
+      settings: RouteSettings(arguments: picPreContainer),
     );
   }
 
@@ -418,16 +433,35 @@ class PicturePreview extends StatefulWidget {
 class _PicturePreviewState extends State<PicturePreview> {
   @override
   Widget build(BuildContext context) {
-    File picture = ModalRoute.of(context).settings.arguments;
+    PicturePreviewContainer arguments =
+        ModalRoute.of(context).settings.arguments;
 
     return Scaffold(
-      appBar: AppBar(
-          // タイトルは拡張子なしのファイル名
-          title: Text(p.basenameWithoutExtension(picture.path))),
-      // 中央に画像を表示
-      body: Center(
-        child: Image.file(picture),
-      ),
-    );
+        appBar: AppBar(
+            // タイトルは拡張子なしのファイル名
+            title:
+                Text(p.basenameWithoutExtension(arguments.takenPicture.path))),
+        // 要素を並べていく
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              Center(
+                child: Image.file(arguments.takenPicture),
+              ),
+              Center(
+                child: Row(
+                  children: [
+                    Image.file(arguments.trimmedPicture),
+                    Image.file(arguments.processedPicture)
+                  ],
+                ),
+              ),
+              Text(
+                arguments.analyzedText.readAsStringSync(),
+                textAlign: TextAlign.left,
+              )
+            ],
+          ),
+        ));
   }
 }

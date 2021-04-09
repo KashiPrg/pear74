@@ -26,7 +26,7 @@ class PictureManager {
   static final _takenDirName = 'Pictures/Taken';
 
   /// トリミングされた写真を保存するディレクトリの名前
-  static final _trimmedDirName = 'Pictures/Taken';
+  static final _trimmedDirName = 'Pictures/Trimmed';
 
   /// 画像処理された写真を保存するディレクトリの名前
   static final _procDirName = 'Pictures/Processed';
