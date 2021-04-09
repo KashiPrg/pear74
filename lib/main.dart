@@ -282,8 +282,9 @@ class CutoutCirclePaint extends CustomPainter {
       ..strokeCap = StrokeCap.round
       ..strokeWidth = 5;
     final center = Offset(size.width / 2, size.height / 2);
-    final radius = min(size.width, size.height);
-    canvas.drawCircle(center, radius, paint);
+    final radius = min(size.width, size.height) * 2;
+    canvas.drawRect(
+        Rect.fromCenter(center: center, width: radius, height: radius), paint);
   }
 
   @override
