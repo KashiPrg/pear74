@@ -226,9 +226,12 @@ class _CameraAppState extends State<CameraApp> {
     // 写真を撮る処理と、その後の処理
     takePicture().then((List<String> filesPath) {
       if (filesPath != null) {
-        // 画像処理
-        showInSnackBar(processImage(filesPath[0], filesPath[1]));
+        // 画像分析の結果を取得
+        String analyzeResult =
+            processImage(filesPath[0], filesPath[1], filesPath[2]);
         // showInSnackBar('Picture saved to ${filesPath[0]}');
+        // 分析結果をテキストファイルに保存
+        File(filesPath[3]).writeAsStringSync(analyzeResult);
       }
     });
   }
@@ -301,17 +304,23 @@ class SavedPictures extends StatefulWidget {
 
 class _SavedPicturesState extends State<SavedPictures> {
   List<File> _takenPicturesList;
+  List<File> _trimmedPicturesList;
   List<File> _processedPicturesList;
+  List<File> _analyzedTextsList;
 
   @override
   Widget build(BuildContext context) {
-    // 撮った写真のファイルパスのリストを取得
+    // 撮った写真などのファイルパスのリストを取得
     _takenPicturesList = PictureManager.processedPicturesPathList();
+    _trimmedPicturesList = PictureManager.trimmedPicturesPathList();
     _processedPicturesList = PictureManager.takenPicturesPathList();
+    _analyzedTextsList = PictureManager.analyzedTextsPathList();
 
     // 新しい順に並べる
     _takenPicturesList.sort((a, b) => b.path.compareTo(a.path));
+    _trimmedPicturesList.sort((a, b) => b.path.compareTo(a.path));
     _processedPicturesList.sort((a, b) => b.path.compareTo(a.path));
+    _analyzedTextsList.sort((a, b) => b.path.compareTo(a.path));
 
     return Scaffold(
         appBar: AppBar(
@@ -337,7 +346,9 @@ class _SavedPicturesState extends State<SavedPictures> {
                     setState(() {
                       // 実体を削除する
                       FileManager.removeFile(takenItem);
+                      FileManager.removeFile(_trimmedPicturesList[index]);
                       FileManager.removeFile(_processedPicturesList[index]);
+                      FileManager.removeFile(_analyzedTextsList[index]);
 
                       // スワイプされた要素をリストから削除する
                       _takenPicturesList.removeAt(index);

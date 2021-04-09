@@ -3,6 +3,46 @@
 using namespace cv;
 using namespace std;
 
+void calcHistAvrStd(Mat hist, int hist_size, float *avr, float *peak, float *std_dev, float *med)
+{
+    float a, max, dev, std_d, sum, mid, next;
+    int i;
+
+    for(i = 0, mid = 0.0; i < hist_size; i++)
+        mid += hist.at<float>(i);
+    mid *= 0.5;
+
+    for(i = 0, sum = 0.0; i < hist_size; i++){
+        next = sum + hist.at<float>(i);
+        if(next >= mid){
+            *med = (float)i;
+            break;
+        }
+        else
+            sum = next;
+    }
+
+    for(i = 0, a = 0.0, max = 0.0, sum = 0.0; i < hist_size; i++){
+        a += (float)i * hist.at<float>(i);
+        sum += hist.at<float>(i);
+        if(max < hist.at<float>(i))
+            max = (float)i;
+    }
+
+    a = a / sum;
+
+    for(i = 0, std_d = 0.0; i < hist_size; i++){
+        dev = (float)i - a;
+        dev *= dev;
+        std_d += dev * hist.at<float>(i);
+    }
+
+    // avr:平均値　peak:最大値　std_dev:標準偏差
+    *avr = a;
+    *peak = max;
+    *std_dev = sqrt(std_d / sum);
+}
+
 // Avoiding name mangling
 extern "C" {
     // Attributes to prevent 'unused' function from being removed and to make it visible
@@ -12,24 +52,8 @@ extern "C" {
     }
 
     __attribute__((visibility("default"))) __attribute__((used))
-    char* process_image(char* inputImagePath, char* outputImagePath) {
-        /*
-        Mat input = imread(inputImagePath, IMREAD_GRAYSCALE);
-        Mat threshed, withContours;
-
-        vector<vector<Point>> contours;
-        vector<Vec4i> hierarchy;
-
-        adaptiveThreshold(input, threshed, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY_INV, 77, 6);
-        findContours(threshed, contours, hierarchy, RETR_TREE, CHAIN_APPROX_TC89_L1);
-
-        cvtColor(threshed, withContours, COLOR_GRAY2BGR);
-        drawContours(withContours, contours, -1, Scalar(0, 255, 0), 4);
-
-        imwrite(outputImagePath, withContours);
-        */
-
-       // トリミングする円形の半径
+    const char* process_image(char* inputImagePath, char* trimmedImagePath, char* processedImagePath) {
+        // トリミングする円形の半径
         int trim_radius = 640 / 5 / 2;
 
         // 画像の読み込み(末尾の1はRGBでの読み込みを示す)
@@ -39,57 +63,73 @@ extern "C" {
         int trim_start_x = img.cols / 2 - trim_radius;  // 切り抜きの始点のx座標
         int trim_start_y = img.rows / 2 - trim_radius;  // 切り抜きの始点のy座標
         Mat trimmed = Mat(img, Rect(trim_start_x, trim_start_y, trim_radius * 2, trim_radius * 2));
+        // imwrite(img_path + "_trimmed.jpeg", trimmed);
 
-        // ぼかしでコルクを目立たなくする作戦
-        // ただしコルクの色も少なからず混じるので、地の色よりだいぶ黄色くなる印象
-        // そもそも人間が見たときの見た目をぼかすことにどの程度の意味があるのか？
-        // Mat blurred;
-        // medianBlur(trimmed, blurred, 7);
+        // RGB -> Lab
 
-        // 切り抜いた画像を更に円形にマスキングする(円の内側だけ残す)
-        // 切り抜いた画像と同じ寸法の真っ黒な画像
-        Mat mask = Mat::zeros(trimmed.cols, trimmed.rows, CV_8UC3);
+        Mat dst_img;
 
-        // マスクとなる白く塗りつぶされた円を、マスク画像に描画
-        // circle(対象画像, 中心座標, 半径, RGB色指定, 円の太さ(負の値で塗りつぶし。FILLED=-1))
-        circle(mask, Point(mask.cols / 2, mask.rows / 2), mask.rows / 2, Scalar(255, 255, 255), FILLED);
+        cvtColor(trimmed, dst_img, COLOR_BGR2Lab);
 
-        // マスキング
-        // マスク対象画像.copyTo(出力先, マスク)
-        Mat masked;
-        trimmed.copyTo(masked, mask);
 
-        // エッジ検出によってコルクを検出し、画像からコルクを取り除く
-        // しかし結果を見るに、解像度が荒い故にうまく行っている部分がある気がする
-        // エッジ検出のためグレースケール化
-        Mat cir_gray;
-        cvtColor(trimmed, cir_gray, COLOR_BGR2GRAY);
-        // ラプラシアンエッジ検出
-        Mat laplacian;
-        Laplacian(cir_gray, laplacian, CV_32F, 1, 5);
-        // CV_32F(0.0 ~ 1.0) -> CV_8U(0 ~ 255)への変換を行う
-        laplacian.convertTo(laplacian, CV_8U, 256, 0.0);
+        // Lab : a, b histgram
 
-        // ラプラシアンエッジをマスクとして適用
-        Mat cork_removed;
-        masked.copyTo(cork_removed, laplacian);
+        int lbins = 256, abins = 256, bbins=256;
 
-        // 自動的な二値化でコルクを取り除こうとしたが、やはり下のほうが暗いらしくそちらが引っかかる。
-        // どうにか輝度を平坦化できればうまい具合にできそうだが……？
-        // Mat cir_bin;
-        // threshold(cir_gray, cir_bin, 0, 255, THRESH_BINARY | THRESH_OTSU);
+        int lhistSize[] = {lbins};
+        int ahistSize[] = {abins};
+        int bhistSize[] = {bbins};
 
-        imwrite(outputImagePath, cork_removed);
+        float lrange[] = {0, 255};
+        float arange[] = {0, 255};
+        float brange[] = {0, 255};
+
+        const float* lranges[] = {lrange};
+        const float* aranges[] = {arange};
+        const float* branges[] = {brange};
+
+        int lchannels[] = {0};
+        int achannels[] = {1};
+        int bchannels[] = {2};
+
+        Mat lhist, ahist, bhist;
+
+        calcHist(&dst_img, 1, lchannels, Mat(), lhist, 1, lhistSize, lranges, true, false);
+        calcHist(&dst_img, 1, achannels, Mat(), ahist, 1, ahistSize, aranges, true, false);
+        calcHist(&dst_img, 1, bchannels, Mat(), bhist, 1, bhistSize, branges, true, false);
+
+        float l_avr, l_peak, l_std, l_med;
+        float a_avr, a_peak, a_std, a_med;
+        float b_avr, b_peak, b_std, b_med;
+
+        calcHistAvrStd(lhist, lbins, &l_avr, &l_peak, &l_std, &l_med);
+        // printf("-------------------\n");
+        // printf("Lab-L:AVR = %f, PEAK = %f, STD = %f\n", l_avr, l_peak, l_std);
+
+        calcHistAvrStd(ahist, abins, &a_avr, &a_peak, &a_std, &a_med);
+        // printf("-------------------\n");
+        // printf("Lab-A:AVR = %f, PEAK = %f, STD = %f\n", a_avr, a_peak, a_std);
+
+        calcHistAvrStd(bhist, bbins, &b_avr, &b_peak, &b_std, &b_med);
+        // printf("-------------------\n");
+        // printf("Lab-B:AVR = %f, PEAK = %f, STD = %f\n", b_avr, b_peak, b_std);
+        // printf("%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n", l_avr, l_peak, l_std, l_med, a_avr, a_peak, a_std, a_med, b_avr, b_peak, b_std, b_med);
+        printf("%f, %f, %f\n", l_med, a_med, b_med);
+
+        imwrite(trimmedImagePath, trimmed);
+        imwrite(processedImagePath, dst_img);
 
         // メモリリリース
         img.release();
         trimmed.release();
-        masked.release();
-        mask.release();
-        cir_gray.release();
-        laplacian.release();
-        cork_removed.release();
+        dst_img.release();
 
-        return "2.5";
+        stringstream ss;
+
+        ss << "Lab-L:AVR = " << l_avr << ", MED = " << l_med << ", PEAK = " << l_peak << ", STD = " << l_std;
+        ss << "\nLab-A:AVR = " << a_avr << ", MED = " << a_med << ", PEAK = " << a_peak << ", STD = " << a_std;
+        ss << "\nLab-B:AVR = " << b_avr << ", MED = " << b_med << ", PEAK = " << b_peak << ", STD = " << b_std;
+
+        return ss.str().c_str();
     }
 }
