@@ -86,6 +86,7 @@ class _CameraAppState extends State<CameraApp> {
         );
     controller.initialize().then((_) {
       if (!mounted) {
+        // フラッシュを焚かないようにする
         controller.setFlashMode(FlashMode.off);
         return;
       }
@@ -227,12 +228,9 @@ class _CameraAppState extends State<CameraApp> {
     // 写真を撮る処理と、その後の処理
     takePicture().then((List<String> filesPath) {
       if (filesPath != null) {
-        // 画像分析の結果を取得
-        String analyzeResult =
-            processImage(filesPath[0], filesPath[1], filesPath[2]);
+        // 画像分析
+        processImage(filesPath[0], filesPath[1], filesPath[2], filesPath[3]);
         // showInSnackBar('Picture saved to ${filesPath[0]}');
-        // 分析結果をテキストファイルに保存
-        File(filesPath[3]).writeAsStringSync(analyzeResult);
       }
     });
   }

@@ -1,4 +1,5 @@
 #include <opencv2/opencv.hpp>
+#include <fstream>
 
 using namespace cv;
 using namespace std;
@@ -52,7 +53,7 @@ extern "C" {
     }
 
     __attribute__((visibility("default"))) __attribute__((used))
-    char* process_image(char* inputImagePath, char* trimmedImagePath, char* processedImagePath) {
+    const char* process_image(char* inputImagePath, char* trimmedImagePath, char* processedImagePath, char* analyzedTextPath) {
         // トリミングする円形の半径
         int trim_radius = 640 / 5 / 2;
 
@@ -124,15 +125,19 @@ extern "C" {
         trimmed.release();
         dst_img.release();
 
+        // テキストストリーム
         stringstream ss;
 
+        // ストリームに文章を挿入
         ss << "Lab-L:AVR = " << l_avr << ", MED = " << l_med << ", PEAK = " << l_peak << ", STD = " << l_std;
         ss << "\nLab-A:AVR = " << a_avr << ", MED = " << a_med << ", PEAK = " << a_peak << ", STD = " << a_std;
         ss << "\nLab-B:AVR = " << b_avr << ", MED = " << b_med << ", PEAK = " << b_peak << ", STD = " << b_std;
 
-        char *result_buffer;
-        sprintf(result_buffer, "Lab-L:AVR = %.1f, MED = %.1f, PEAK = %.1f, STD = %.1f\nLab-A:AVR = %.1f, MED = %.1f, PEAK = %.1f, STD = %.1f\nLab-B:AVR = %.1f, MED = %.1f, PEAK = %.1f, STD = %.1f", l_avr, l_med, l_peak, l_std, a_avr, a_med, a_peak, a_std, b_avr, b_med, b_peak, b_std);
+        // ストリームの文章をテキストファイルに保存
+        ofstream outputText(analyzedTextPath);
+        outputText << ss.str();
+        outputText.close();
 
-        return result_buffer;
+        return "1";
     }
 }

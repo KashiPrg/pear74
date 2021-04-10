@@ -12,7 +12,7 @@ import 'package:ffi/ffi.dart';
 // Dart function signatures
 typedef _VersionFunc = ffi.Pointer<Utf8> Function();
 typedef _ProcessImageFunc = ffi.Pointer<Utf8> Function(
-    ffi.Pointer<Utf8>, ffi.Pointer<Utf8>, ffi.Pointer<Utf8>);
+    ffi.Pointer<Utf8>, ffi.Pointer<Utf8>, ffi.Pointer<Utf8>, ffi.Pointer<Utf8>);
 // typedef _ProcessImageFunc = void Function(ffi.Pointer<Utf8>, ffi.Pointer<Utf8>);
 
 // Getting a library that holds needed symbols
@@ -31,9 +31,9 @@ String opencvVersion() {
   return _version().toDartString();
 }
 
-String processImage(
-    String inputPath, String trimmedPath, String processedPath) {
+String processImage(String inputPath, String trimmedPath, String processedPath,
+    String analyzedTextPath) {
   return _processImage(inputPath.toNativeUtf8(), trimmedPath.toNativeUtf8(),
-          processedPath.toNativeUtf8())
+          processedPath.toNativeUtf8(), analyzedTextPath.toNativeUtf8())
       .toDartString();
 }
