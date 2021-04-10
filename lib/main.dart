@@ -86,6 +86,7 @@ class _CameraAppState extends State<CameraApp> {
         );
     controller.initialize().then((_) {
       if (!mounted) {
+        controller.setFlashMode(FlashMode.off);
         return;
       }
       setState(() {});
