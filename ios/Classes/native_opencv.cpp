@@ -129,7 +129,8 @@ extern "C" {
         stringstream ss;
 
         // ストリームに文章を挿入
-        ss << "Lab-L:AVR = " << l_avr << ", MED = " << l_med << ", PEAK = " << l_peak << ", STD = " << l_std;
+        ss << "2.5";    // カラーチャートの値
+        ss << "\nLab-L:AVR = " << l_avr << ", MED = " << l_med << ", PEAK = " << l_peak << ", STD = " << l_std;
         ss << "\nLab-A:AVR = " << a_avr << ", MED = " << a_med << ", PEAK = " << a_peak << ", STD = " << a_std;
         ss << "\nLab-B:AVR = " << b_avr << ", MED = " << b_med << ", PEAK = " << b_peak << ", STD = " << b_std;
 
@@ -138,6 +139,6 @@ extern "C" {
         outputText << ss.str();
         outputText.close();
 
-        return "1";
+        return "2.5";
     }
 }

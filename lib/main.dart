@@ -66,7 +66,7 @@ class _CameraAppState extends State<CameraApp> {
   // カラーチャート分析の結果を表示する領域の大きさ(高さ)
   double _colorChartContainerHeight = 80.0;
   // そこに表示されるテキスト
-  String _colorChartContainerText = "2.0";
+  String _colorChartContainerText = "";
 
   // final double _bottomBoxHeight = 75.0;
 
@@ -251,8 +251,13 @@ class _CameraAppState extends State<CameraApp> {
     takePicture().then((List<String> filesPath) {
       if (filesPath != null) {
         // 画像分析
-        processImage(filesPath[0], filesPath[1], filesPath[2], filesPath[3]);
-        showInSnackBar('2.5');
+        String retstr = processImage(
+            filesPath[0], filesPath[1], filesPath[2], filesPath[3]);
+        setState(() {
+          // カラーチャート表示を更新
+          _colorChartContainerText = retstr;
+        });
+        // showInSnackBar('2.5');
       }
     });
   }
@@ -440,7 +445,9 @@ class _SavedPicturesState extends State<SavedPictures> {
                   // 拡張子なしのファイル名
                   title: Text(p.basenameWithoutExtension(takenItem.path)),
                   // カラーチャートの数値
-                  trailing: Text('2.5'),
+                  trailing: Text(_analyzedTextsList[index]
+                      .readAsStringSync()
+                      .split("\n")[0]),
                 )),
               );
             }));
