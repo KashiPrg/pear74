@@ -63,6 +63,11 @@ class _CameraAppState extends State<CameraApp> {
   double _cutoutCircleSize = 40.0;
   bool _cutoutCircleSizeDecided = false;
 
+  // カラーチャート分析の結果を表示する領域の大きさ(高さ)
+  double _colorChartContainerHeight = 80.0;
+  // そこに表示されるテキスト
+  String _colorChartContainerText = "2.0";
+
   // final double _bottomBoxHeight = 75.0;
 
   @override
@@ -144,6 +149,31 @@ class _CameraAppState extends State<CameraApp> {
                           key: _cameraPreviewKey,
                           child: CameraPreview(controller),
                         )),
+                        // カラーチャートの分析結果を表示する領域
+                        Column(
+                          children: [
+                            Expanded(flex: 26, child: Container()),
+                            Expanded(
+                              flex: 5,
+                              child: Opacity(
+                                opacity: 1.0,
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                      color: Colors.lightGreen[700],
+                                      borderRadius: BorderRadius.circular(15)),
+                                  child: Text(
+                                    _colorChartContainerText,
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 40),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Expanded(flex: 1, child: Container()),
+                          ],
+                        ),
                         // 切り抜き範囲提示用の輪
                         Center(
                             child: CustomPaint(
@@ -222,7 +252,7 @@ class _CameraAppState extends State<CameraApp> {
       if (filesPath != null) {
         // 画像分析
         processImage(filesPath[0], filesPath[1], filesPath[2], filesPath[3]);
-        // showInSnackBar('Picture saved to ${filesPath[0]}');
+        showInSnackBar('2.5');
       }
     });
   }
@@ -230,7 +260,20 @@ class _CameraAppState extends State<CameraApp> {
   /// スナックバー表示、画像保存時にファイルパスが表示される
   void showInSnackBar(String message) {
     // deprecatedな部分を修正する方法が現状不明
-    _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(
+        message,
+        style: TextStyle(color: Colors.white),
+        textAlign: TextAlign.center,
+      ),
+      duration: Duration(seconds: 5),
+      backgroundColor: Colors.lightGreen[700],
+      elevation: 6.0,
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10))),
+    ));
+    // _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(message)));
   }
 
   /// カメラ撮影処理
