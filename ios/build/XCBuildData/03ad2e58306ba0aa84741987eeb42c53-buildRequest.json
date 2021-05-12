@@ -1,0 +1,51 @@
+{
+  "buildCommand" : "prepareForIndexing",
+  "configuredTargets" : [
+    {
+      "guid" : "0cdc0a2bb7bf4b662a2c9536070ef0c89da425bb6d6d5d8dbb95e4afffb82217"
+    },
+    {
+      "guid" : "0cdc0a2bb7bf4b662a2c9536070ef0c8312b4bc59bbbe2c06c205bf4da6737f5"
+    },
+    {
+      "guid" : "0cdc0a2bb7bf4b662a2c9536070ef0c8e49342c138073362b0292529c5fa2a96"
+    },
+    {
+      "guid" : "0cdc0a2bb7bf4b662a2c9536070ef0c83fd640372e002a13ac48f262f3c453d9"
+    },
+    {
+      "guid" : "0cdc0a2bb7bf4b662a2c9536070ef0c8d6b4f9cd0664e4caf87e0ca8814c7d76"
+    }
+  ],
+  "continueBuildingAfterErrors" : true,
+  "enableIndexBuildArena" : false,
+  "hideShellScriptEnvironment" : false,
+  "parameters" : {
+    "action" : "build",
+    "arenaInfo" : {
+      "buildIntermediatesPath" : "",
+      "buildProductsPath" : "",
+      "derivedDataPath" : "/Users/nakashima/Library/Developer/Xcode/DerivedData",
+      "indexDataStoreFolderPath" : "/Users/nakashima/Library/Developer/Xcode/DerivedData/Pods-ajsmbcrvnldmlqbfvzltsjjgavau/Index/DataStore",
+      "indexEnableDataStore" : true,
+      "indexPCHPath" : "/Users/nakashima/Library/Developer/Xcode/DerivedData/Pods-ajsmbcrvnldmlqbfvzltsjjgavau/Index/PrecompiledHeaders",
+      "pchPath" : ""
+    },
+    "configurationName" : "Release",
+    "overrides" : {
+      "synthesized" : {
+        "table" : {
+          "ENABLE_PREVIEWS" : "NO"
+        }
+      }
+    }
+  },
+  "qos" : "default",
+  "schemeCommand" : "launch",
+  "shouldCollectMetrics" : false,
+  "showNonLoggedProgress" : true,
+  "useDryRun" : true,
+  "useImplicitDependencies" : false,
+  "useLegacyBuildLocations" : false,
+  "useParallelTargets" : false
+}

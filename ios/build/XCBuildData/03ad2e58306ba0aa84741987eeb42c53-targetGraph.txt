@@ -1,0 +1,13 @@
+Target dependency graph (5 targets)
+Flutter in Pods
+camera in Pods, depends on:
+Flutter in Pods (explicit)
+judge_colorchart in Pods, depends on:
+Flutter in Pods (explicit)
+path_provider in Pods, depends on:
+Flutter in Pods (explicit)
+Pods-Runner in Pods, depends on:
+Flutter in Pods (explicit)
+camera in Pods (explicit)
+judge_colorchart in Pods (explicit)
+path_provider in Pods (explicit)

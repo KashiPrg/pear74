@@ -42,16 +42,7 @@ void logError(String code, String message) =>
 /// Main
 class MainApp extends StatelessWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      initialRoute: '/',
-      routes: <String, WidgetBuilder>{
-        '/': (BuildContext context) => new CameraApp(),
-        '/SavedPictures': (BuildContext context) => new SavedPictures(),
-        '/PicturePreview': (BuildContext context) => new PicturePreview(),
-      },
-    );
-  }
+  Widget build(BuildContext context) => MaterialApp(home: CameraApp());
 }
 
 /// カメラウィジェット
@@ -188,7 +179,8 @@ class _CameraAppState extends State<CameraApp> {
                             color: Colors.black,
                           ),
                           onPressed: () {
-                            Navigator.of(context).pushNamed('/SavedPictures');
+                            Navigator.of(context)
+                                .push<dynamic>(SavedPictures.route());
                           }),
                     ),
 
@@ -297,6 +289,14 @@ class CutoutCirclePaint extends CustomPainter {
 
 /// 撮った写真の一覧を表示する画面
 class SavedPictures extends StatefulWidget {
+  /// ページ呼び出し用のメソッド
+  static Route<dynamic> route() {
+    return MaterialPageRoute<dynamic>(
+      builder: (_) => new SavedPictures(),
+      settings: RouteSettings(name: "/SavedPictures"),
+    );
+  }
+
   @override
   _SavedPicturesState createState() => _SavedPicturesState();
 }
@@ -385,12 +385,12 @@ class _SavedPicturesState extends State<SavedPictures> {
                     child: ListTile(
                   onTap: () {
                     // タッチしたらその写真のプレビューに飛ぶ
-                    Navigator.of(context).pushNamed('/PicturePreview',
-                        arguments: new PicturePreviewContainer(
+                    Navigator.of(context).push<dynamic>(PicturePreview.route(
+                        picPreContainer: new PicturePreviewContainer(
                             takenItem,
                             _trimmedPicturesList[index],
                             _processedPicturesList[index],
-                            _analyzedTextsList[index]));
+                            _analyzedTextsList[index])));
                   },
                   // 画像のサムネイル
                   leading: Image.file(takenItem),
@@ -404,6 +404,7 @@ class _SavedPicturesState extends State<SavedPictures> {
   }
 }
 
+/// 撮った写真の確認用の画面に複数の引数を渡すためのコンテナクラス
 class PicturePreviewContainer {
   PicturePreviewContainer(this.takenPicture, this.trimmedPicture,
       this.processedPicture, this.analyzedText);
@@ -421,7 +422,8 @@ class PicturePreview extends StatefulWidget {
       {@required PicturePreviewContainer picPreContainer}) {
     return MaterialPageRoute<dynamic>(
       builder: (_) => new PicturePreview(),
-      settings: RouteSettings(arguments: picPreContainer),
+      settings:
+          RouteSettings(name: "/PicturePreview", arguments: picPreContainer),
     );
   }
 
