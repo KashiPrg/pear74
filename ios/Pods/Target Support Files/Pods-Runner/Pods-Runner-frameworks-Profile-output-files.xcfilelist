@@ -1,0 +1,3 @@
+${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/camera.framework
+${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/judge_colorchart.framework
+${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/path_provider.framework

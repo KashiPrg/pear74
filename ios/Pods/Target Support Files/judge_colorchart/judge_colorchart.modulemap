@@ -1,0 +1,6 @@
+framework module judge_colorchart {
+  umbrella header "judge_colorchart-umbrella.h"
+
+  export *
+  module * { export * }
+}

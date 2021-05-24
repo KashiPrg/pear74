@@ -1,0 +1,36 @@
+{
+  "name": "judge_colorchart",
+  "version": "0.0.1",
+  "summary": "A new flutter plugin project.",
+  "description": "A new flutter plugin project.",
+  "homepage": "http://example.com",
+  "license": "MIT",
+  "authors": {
+    "Kento Nakashima(JAIST Miyata Lab)": "miyata@jaist.ac.jp"
+  },
+  "source": {
+    "path": "."
+  },
+  "source_files": "Classes/*.{swift,c,m,h,mm,cpp,plist}",
+  "dependencies": {
+    "Flutter": [
+
+    ]
+  },
+  "platforms": {
+    "ios": "8.0"
+  },
+  "pod_target_xcconfig": {
+    "DEFINES_MODULE": "YES",
+    "VALID_ARCHS[sdk=iphonesimulator*]": "x86_64"
+  },
+  "swift_versions": "5.0",
+  "preserve_paths": "opencv2.framework",
+  "xcconfig": {
+    "OTHER_LDFLAGS": "-framework opencv2"
+  },
+  "vendored_frameworks": "opencv2.framework",
+  "frameworks": "AVFoundation",
+  "libraries": "c++",
+  "swift_version": "5.0"
+}
